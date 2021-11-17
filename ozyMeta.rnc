@@ -1,0 +1,35 @@
+start = xml
+xml = element xml { meta, poem }
+meta = element meta { title, author, publication, source }
+title = element title {text}
+# ebb: The title element does not always include a type attribute in the XML.
+# What repetition indicator should you use to indicate it may appear zero or one time? 
+author = element author {text}
+# ebb: You say here that author is an attribute. 
+# But in the XML it is an element, and your rule is causing validation errors as a result.
+publication = element publication { title, pubPlace, date }
+# ebb: In the XML, the publication element contains another element besides these two.
+# What are you missing?
+pubPlace = element pubPlace {text}
+# ebb: In the XML, pubPlace only contains text. Where does the date element belong?
+date = element date {when, text}
+when = attribute when { xsd:gYear | xsd:date | xsd:gMonth }
+# ebb: Good use of the range of date datatypes for options here.
+source = element source { text, ref }
+ref = element ref { target }
+target = attribute target { xsd:anyURI }
+poem = element poem { l+ }
+l = element l { n, mixed{(person | place | object | fragment)+}*, text }
+# ebb: This has a number of problems. First, n is only an attribute,
+# so it may only appear at MOST just once. So you don't want that repetition indicator on it.
+# Next, you are creating an optional selection of elements that may appear
+# zero or more times, but you are not accounting for the presence of text flowing around 
+# those optional elements. You need to set up mixed{} syntax to wrap around this
+# parenthetical grouping. Read how to do this on the Relax NG tutorial:
+# https://newtfire.org/courses/tutorials/explainRNG.html and do a search on the page for 
+# mixed to see some examples of how to code it. 
+n = attribute n { xsd:integer }
+person = element person { text }
+place = element place { text }
+object = element object { text }
+fragment = element fragment { text }
